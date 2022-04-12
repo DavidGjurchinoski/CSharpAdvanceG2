@@ -32,11 +32,25 @@ namespace Entities
 
         public static bool Validate(Dog dog)
         {
-            if(dog.Id < VALID_ID_START_NUMBER || dog.Name.Length >= MIN_NAME_LENGHT || string.IsNullOrEmpty(dog.Color))
+            if(dog.Id < VALID_ID_START_NUMBER)
             {
+                Console.WriteLine("The id is Invalid");
                 
                 return false;
+            }
 
+            if (dog.Name.Length < MIN_NAME_LENGHT)
+            {
+                Console.WriteLine("The Name is Invalid");
+
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(dog.Color))
+            {
+                Console.WriteLine("You need to have a color for your dog");
+
+                return false;
             }
 
             return true;
