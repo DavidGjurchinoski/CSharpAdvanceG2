@@ -7,7 +7,7 @@
         {
             if (string.IsNullOrEmpty(input) && string.IsNullOrWhiteSpace(input))
             {
-                Console.WriteLine("Password can't be empty!");
+                Console.WriteLine("Input can't be empty!");
 
                 return true;
             }
@@ -20,7 +20,7 @@
 
             if (input.Length < minNumOfLetters)
             {
-                Console.WriteLine("Password needs to have at least 5 chars!");
+                Console.WriteLine($"Input needs to have at least {minNumOfLetters} chars!");
 
                 return true;
             }

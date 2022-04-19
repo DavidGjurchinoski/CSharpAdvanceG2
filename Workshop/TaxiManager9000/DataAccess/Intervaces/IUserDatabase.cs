@@ -7,7 +7,13 @@ namespace TaxiManager9000.DataAccess.Intervaces
 
         void Insert(User user);
 
-        User GetByUserNameAndPassword(string userName, string password);    
+        User GetByUserNameAndPassword(string userName, string password);
+
+        bool Delete(User user);
+        
+        void PrintUsers();
+
+        User GetUserById(int id);
 
     }
 }

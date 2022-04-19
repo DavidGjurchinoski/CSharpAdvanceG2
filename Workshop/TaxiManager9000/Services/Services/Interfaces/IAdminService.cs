@@ -7,5 +7,9 @@ namespace TaxiManager9000.Services.Services.Interfaces
 
         bool CreateNewUser(User user);
 
+        bool DeleteUser();
+
+        
+
     }
 }
