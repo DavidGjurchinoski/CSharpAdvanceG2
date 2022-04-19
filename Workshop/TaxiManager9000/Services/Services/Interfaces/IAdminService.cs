@@ -9,7 +9,7 @@ namespace TaxiManager9000.Services.Services.Interfaces
 
         bool DeleteUser();
 
-        
+        List<User> GetAllUsers();
 
     }
 }

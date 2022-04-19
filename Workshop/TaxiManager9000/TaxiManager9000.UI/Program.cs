@@ -5,7 +5,6 @@ using TaxiManager9000.Services;
 using TaxiManager9000.Services.Interfaces;
 using TaxiManager9000.Services.Services;
 using TaxiManager9000.Services.Services.Interfaces;
-using TaxiManager9000.Shared.Utils;
 using TaxiManager9000.UI.Utils;
 
 IAuthService authService = new AuthService();
@@ -48,7 +47,7 @@ void ShowAdminMenu(IAdminService adminService)
     //ShowCreateNewUser(adminService);
 
     ShowDeleteUser(adminService);
-    
+
 }
 
 void ShowMaintainenceMenu(IAuthService authService)
@@ -94,9 +93,7 @@ void ShowCreateNewUser(IAdminService adminService)
     string password = Console.ReadLine();
 
     Console.WriteLine("Choose one of the roles by number");
-    // Ask here about method in EnumUtils
-    //Role role = new Role();
-    //role.PrintAllEnumsWithNumbers();
+
     foreach (int i in Enum.GetValues(typeof(Role)))
     {
         Console.Write($"{i}. ");
@@ -106,28 +103,28 @@ void ShowCreateNewUser(IAdminService adminService)
 
     string roleString = Console.ReadLine();
 
-    if (int.TryParse(roleString, out int roleId))
+    if (Enum.TryParse(roleString, out Role role))
     {
-        if (Enum.IsDefined(typeof(Role), roleId))
+        try
         {
-            try
-            {
 
-                if (adminService.CreateNewUser(new User(username, password, (Role)roleId))) ConsoleUtils
-                                .WriteLineInColor($"Successful creation of an {(Role)roleId} user!", ConsoleColor.Green);
+            if (adminService.CreateNewUser(new User(username, password, role))) ConsoleUtils
+                            .WriteLineInColor($"Successful creation of an {role} user!", ConsoleColor.Green);
 
-            }
-            catch (UserNotCreatedExeption ex)
-            {
-                Console.WriteLine(ex);
-            }
+            adminService.GetAllUsers().ForEach(Console.WriteLine);
+
         }
-        else Console.WriteLine("Enter one of the shown numbers!");
+        catch (UserNotCreatedExeption ex)
+        {
+            Console.WriteLine(ex);
+        }
     }
-    else Console.WriteLine("Please enter only numbers!");
+    else Console.WriteLine("Enter one of the shown numbers!");
 }
 
 void ShowDeleteUser(IAdminService adminService)
 {
+    adminService.GetAllUsers().ForEach(Console.WriteLine);
+
     if (!adminService.DeleteUser()) ShowAdminMenu(adminService);
 }

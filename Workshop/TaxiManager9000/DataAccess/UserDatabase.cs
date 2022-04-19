@@ -26,9 +26,9 @@ namespace TaxiManager9000.DataAccess
             return _users.Remove(user);
         }
 
-        public void PrintUsers()
+        public List<User> GetAll()
         {
-            _users.ForEach(user => Console.WriteLine($"{user.Id}. {user.UserName} {user.Role}"));
+            return _users;
         }
 
         public User GetByUserNameAndPassword(string username, string password)

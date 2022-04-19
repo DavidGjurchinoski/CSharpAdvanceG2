@@ -25,5 +25,10 @@ namespace TaxiManager9000.Domain.Entities
             Password = password;
             Role = role;
         }
+
+        public override string ToString()
+        {
+            return $"Id: {Id}, Username: {UserName}, Role: {Role}";
+        }
     }
 }

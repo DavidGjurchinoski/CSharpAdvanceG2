@@ -11,7 +11,7 @@ namespace TaxiManager9000.DataAccess.Intervaces
 
         bool Delete(User user);
         
-        void PrintUsers();
+        List<User> GetAll();
 
         User GetUserById(int id);
 

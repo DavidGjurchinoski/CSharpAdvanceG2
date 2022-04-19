@@ -21,14 +21,11 @@ namespace TaxiManager9000.Services.Services
 
         public bool CreateNewUser(User user)
         {
-            _dataBase.PrintUsers();
 
             if (CheckPassword(user.Password) && CheckUserName(user.UserName))
             {
 
                 _dataBase.Insert(user);
-
-                _dataBase.PrintUsers();
 
                 return true;
             }
@@ -41,8 +38,6 @@ namespace TaxiManager9000.Services.Services
         {
             Console.WriteLine("Choose a user by id to delete");
 
-            _dataBase.PrintUsers();
-
             string userId = Console.ReadLine();
 
             if(int.TryParse(userId, out int userIdInt))
@@ -52,7 +47,6 @@ namespace TaxiManager9000.Services.Services
                 _dataBase.Delete(pickedUser);
 
                 Console.WriteLine("After deleting");
-                _dataBase.PrintUsers();
 
                 return true;
             } 
@@ -63,6 +57,11 @@ namespace TaxiManager9000.Services.Services
                 return false;
             };
 
+        }
+
+        public List<User> GetAllUsers()
+        {
+            return _dataBase.GetAll();
         }
 
         private bool CheckPassword(string password)
@@ -95,6 +94,8 @@ namespace TaxiManager9000.Services.Services
 
             return true;
         }
+
+
 
     }
 }
