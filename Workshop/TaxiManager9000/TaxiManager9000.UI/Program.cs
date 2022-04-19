@@ -126,5 +126,25 @@ void ShowDeleteUser(IAdminService adminService)
 {
     adminService.GetAllUsers().ForEach(Console.WriteLine);
 
-    if (!adminService.DeleteUser()) ShowAdminMenu(adminService);
+    Console.WriteLine("Choose a user by id to delete");
+
+    string userId = Console.ReadLine();
+
+    if (int.TryParse(userId, out int userIdInt))
+    {
+        if (adminService.DeleteUser(userIdInt))
+        {
+            Console.WriteLine("User Deleted");
+
+            ShowAdminMenu(adminService);
+        } else
+        {
+            Console.WriteLine("Entered number is not valid!");
+        }
+    }
+    else
+    {
+        Console.WriteLine("Invalid Input");
+    };
+
 }

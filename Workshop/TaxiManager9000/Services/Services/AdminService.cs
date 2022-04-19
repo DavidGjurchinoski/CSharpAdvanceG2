@@ -34,29 +34,16 @@ namespace TaxiManager9000.Services.Services
 
         }
 
-        public bool DeleteUser()
+        public bool DeleteUser(int userId)
         {
-            Console.WriteLine("Choose a user by id to delete");
+            User pickedUser = _dataBase.GetUserById(userId);
 
-            string userId = Console.ReadLine();
-
-            if(int.TryParse(userId, out int userIdInt))
+            if (_dataBase.Delete(pickedUser))
             {
-                User pickedUser = _dataBase.GetUserById(userIdInt);
-
-                _dataBase.Delete(pickedUser);
-
-                Console.WriteLine("After deleting");
-
                 return true;
-            } 
-            else
-            {
-                Console.WriteLine("Invalid Input");
-
-                return false;
             };
 
+            return false;
         }
 
         public List<User> GetAllUsers()
