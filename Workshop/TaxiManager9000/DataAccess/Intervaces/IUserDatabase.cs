@@ -2,18 +2,11 @@
 
 namespace TaxiManager9000.DataAccess.Intervaces
 {
-    public interface IUserDatabase
+    public interface IUserDatabase : IDatabase<User>
     {
-
-        void Insert(User user);
 
         User GetByUserNameAndPassword(string userName, string password);
 
-        bool Delete(User user);
-        
-        List<User> GetAll();
-
-        User GetUserById(int id);
 
     }
 }

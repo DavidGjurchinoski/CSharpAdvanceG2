@@ -1,16 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TaxiManager9000.Domain.Enums;
+﻿using TaxiManager9000.Domain.Enums;
 
 namespace TaxiManager9000.Domain.Entities
 {
-    public class Driver
+    public class Driver : BaseEntety
     {
 
-        public int Id { get; set; }
+
+        public Driver(string firstName, int lastName, Shift shift, Car car, string license, DateTime licenseExpieryDate)
+        {
+            //Id = -1;
+            FirstName = firstName;
+            LastName = lastName;
+            Shift = shift;
+            Car = car;
+            License = license;
+            LicenseExpieryDate = licenseExpieryDate;
+        }
+
+        //public int Id { get; set; }
 
         public string FirstName { get; set; }
 

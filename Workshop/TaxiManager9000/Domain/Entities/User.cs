@@ -2,13 +2,13 @@
 
 namespace TaxiManager9000.Domain.Entities
 {
-    public class User
+    public class User : BaseEntety 
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
         public string UserName { get; set; }
-    
-        public string Password { get; set; }  
+
+        public string Password { get; set; }
 
         public Role Role { get; set; }
 
@@ -18,9 +18,9 @@ namespace TaxiManager9000.Domain.Entities
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <param name="role"></param>
-        public User(string userName, string password, Role role)
+        public User(string userName, string password, Role role) : base()
         {
-            Id = -1;
+            //Id = -1;
             UserName = userName;
             Password = password;
             Role = role;
@@ -30,5 +30,12 @@ namespace TaxiManager9000.Domain.Entities
         {
             return $"Id: {Id}, Username: {UserName}, Role: {Role}";
         }
+
+        public void ChangePassword(string newPassword)
+        {
+            Password = newPassword;
+        }
+
+
     }
 }

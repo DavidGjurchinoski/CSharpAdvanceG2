@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TaxiManager9000.Domain.Entities
+﻿ namespace TaxiManager9000.Domain.Entities
 {
-    public class Car
+    public class Car : BaseEntety
     {
-        public Car(int id, string model, string licaLicensePlate, DateTime licensePlateExpieryDate, Driver asignedDrivers)
+        public Car(string model, string licaLicensePlate, DateTime licensePlateExpieryDate, List<Driver> asignedDrivers)
         {
-            Id = id;
+            //Id = -1;
             Model = model;
             LicaLicensePlate = licaLicensePlate;
             LicensePlateExpieryDate = licensePlateExpieryDate;
             AsignedDrivers = asignedDrivers;
         }
 
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
         public string Model { get; set; }
 
@@ -25,7 +19,7 @@ namespace TaxiManager9000.Domain.Entities
 
         public DateTime LicensePlateExpieryDate { get; set; }
 
-        public Driver AsignedDrivers { get; set; }
+        public List<Driver> AsignedDrivers { get; set; }
 
     }
 }
