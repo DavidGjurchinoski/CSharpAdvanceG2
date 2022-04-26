@@ -8,6 +8,7 @@ using TaxiManager9000.Services.Services.Interfaces;
 using TaxiManager9000.Shared.Enums;
 using TaxiManager9000.Shared.Helpers;
 using TaxiManager9000.Shared.Services;
+using TaxiManager9000.Shared.Utils;
 using TaxiManager9000.UI.Utils;
 
 IAuthService authService = new AuthService();
@@ -228,7 +229,7 @@ void ShowManagerMenu(IAuthService authService, IManagerService managerService)
             ShowAssignDrivers(maintenanceService);
             break;
         case InputHelper.SHOW_UNASSIGN_DRIVER_MANAGER:
-            ShowUnAssignDrivers(maintenanceService);
+            ShowUnAssignDrivers(managerService);
             break;
         case InputHelper.CHANGE_PASSWORD:
             ShowChangePassword(authService, adminService);
@@ -246,18 +247,121 @@ void ShowManagerMenu(IAuthService authService, IManagerService managerService)
     }
 }
 
-void ShowUnAssignDrivers(IMaintenanceService maintenanceService)
+void ShowUnAssignDrivers(IManagerService managerService)
 {
     Console.WriteLine("List of all assigned drivers:");
-    managerService.GetAllDrivers().Where(driver => driver.Car != null).ToList().ForEach(Console.WriteLine);
+    managerService.GetAllAssignedDrivers().ForEach(Console.WriteLine);
+
+    string pickedIdDriverString = Console.ReadLine();
+
+    if (pickedIdDriverString.IsEmpty())
+    {
+        ConsoleUtils.WriteLineInColor("Please enter something!", ConsoleColor.Red);
+
+        ShowManagerMenu(authService, managerService);
+    }
+
+    if (!int.TryParse(pickedIdDriverString, out int pickedIdDriverInt))
+    {
+        ConsoleUtils.WriteLineInColor("Please enter a number!", ConsoleColor.Red);
+
+        ShowManagerMenu(authService, managerService);
+    }
+
+    if (managerService.GetAllAssignedDrivers().Count < pickedIdDriverInt)
+    {
+        ConsoleUtils.WriteLineInColor("Enter one of the given numbers!", ConsoleColor.Red);
+
+        ShowManagerMenu(authService, managerService);
+    }
+
+    managerService.UnAssignDriver(managerService.GetDriverById(pickedIdDriverInt));
+
+    ConsoleUtils.WriteLineInColor("Druver UnAssigned", ConsoleColor.Yellow);
 
     ShowMenu(authService, adminService, maintenanceService, managerService);
 }
 
 void ShowAssignDrivers(IMaintenanceService maintenanceService)
 {
-    Console.WriteLine("List of all unassigned drivers:");
-    managerService.GetAllDrivers().Where(driver => driver.Car == null).ToList().ForEach(Console.WriteLine);
+    Console.WriteLine("List of all unassigned drivers: (Pick by number)");
+    managerService.GetAllUnassignedDrivers().ForEach(Console.WriteLine);
+
+    string pickedIdDriverString = Console.ReadLine();
+
+    if (pickedIdDriverString.IsEmpty())
+    {
+        ConsoleUtils.WriteLineInColor("Please enter something!", ConsoleColor.Red);
+
+        ShowManagerMenu(authService, managerService);
+    }
+
+    if(!int.TryParse(pickedIdDriverString, out int pickedIdDriverInt))
+    {
+        ConsoleUtils.WriteLineInColor("Please enter a number!", ConsoleColor.Red);
+
+        ShowManagerMenu(authService, managerService);
+    }
+
+    if(managerService.GetAllUnassignedDrivers().Count < pickedIdDriverInt)
+    {
+        ConsoleUtils.WriteLineInColor("Enter one of the given numbers!", ConsoleColor.Red);
+
+        ShowManagerMenu(authService, managerService);
+    }
+
+    Driver pickedDriver = managerService.GetDriverById(pickedIdDriverInt);
+
+    Console.WriteLine("Pick a shift from the given options!");
+    foreach(int i in Enum.GetValues(typeof(Shift)))
+    {
+        Console.Write($"{i}. ");
+
+        Console.WriteLine((Shift)i);
+    }
+
+    string pickedShiftString = Console.ReadLine();
+
+    if (!Enum.TryParse(pickedShiftString, out Shift pickedShift))
+    {
+        ConsoleUtils.WriteLineInColor("Enter only numbers!", ConsoleColor.Red);
+
+        ConsoleUtils.WriteLineInColor("Returning to Main Menu...", ConsoleColor.Yellow);
+
+        ShowManagerMenu(authService, managerService);
+    };
+
+    Console.WriteLine("List of all cars that are free thet SHIFT: (Pick by number)");
+    managerService.GetAllVehiclesThatAreFreeThatShift(pickedShift).ForEach(Console.WriteLine);
+
+    string pickedIdVehicleString = Console.ReadLine();
+
+    if (pickedIdDriverString.IsEmpty())
+    {
+        ConsoleUtils.WriteLineInColor("Please enter something!", ConsoleColor.Red);
+
+        ShowManagerMenu(authService, managerService);
+    }
+
+    if (!int.TryParse(pickedIdVehicleString, out int pickedIdVehicleInt))
+    {
+        ConsoleUtils.WriteLineInColor("Please enter a number!", ConsoleColor.Red);
+
+        ShowManagerMenu(authService, managerService);
+    }
+
+    if (managerService.GetAllUnassignedDrivers().Count < pickedIdVehicleInt)
+    {
+        ConsoleUtils.WriteLineInColor("Enter one of the given numbers!", ConsoleColor.Red);
+
+        ShowManagerMenu(authService, managerService);
+    }
+
+    Vehicle pickedVehicle = managerService.GetVehicleById(pickedIdVehicleInt);
+
+    managerService.AssignDriver(pickedDriver, pickedVehicle, pickedShift);
+
+    ConsoleUtils.WriteLineInColor("Driver Asigned", ConsoleColor.Green);
 
     ShowMenu(authService, adminService, maintenanceService, managerService);
 }

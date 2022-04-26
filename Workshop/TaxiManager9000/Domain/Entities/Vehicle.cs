@@ -1,6 +1,6 @@
 ﻿ namespace TaxiManager9000.Domain.Entities
 {
-    public class Vehicle : BaseEntety
+    public class Vehicle : BaseEntity
     {
         public Vehicle(string model, string licaLicensePlate, DateTime licensePlateExpieryDate)
         {
@@ -8,6 +8,8 @@
             LicensePlate = licaLicensePlate;
             LicensePlateExpieryDate = licensePlateExpieryDate;
             //AsignedDrivers = asignedDrivers;
+
+            AssignedDrivers = new();
         }
 
         public string Model { get; set; }

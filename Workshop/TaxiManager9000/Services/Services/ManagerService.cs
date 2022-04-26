@@ -1,5 +1,6 @@
 ﻿using TaxiManager9000.DataAccess.Intervaces;
 using TaxiManager9000.Domain.Entities;
+using TaxiManager9000.Domain.Enums;
 using TaxiManager9000.Services.Services.Interfaces;
 using TaxiManager9000.Shared;
 
@@ -27,14 +28,46 @@ namespace TaxiManager9000.Services.Services
             return _vehicles.GetAll();
         }
 
-        public void AssignDriver(Driver driver, Vehicle vehicle)
+        public void AssignDriver(Driver driver, Vehicle vehicle, Shift shift)
         {
             vehicle.AssignedDrivers.Add(driver);
+
+            driver.Car = vehicle;
+
+            driver.Shift = shift;
         }
 
-        public void UnAssignDriver(Driver driver, Vehicle vehicle)
+        public void UnAssignDriver(Driver driver)
         {
-            vehicle.AssignedDrivers.Remove(driver);
+            driver.Car.AssignedDrivers.Remove(driver);
+
+            driver.Car = null;
         }
+
+        public List<Vehicle> GetAllVehiclesThatAreFreeThatShift(Shift shift)
+        {
+            return _vehicles.GetAll().Where(vehicle => vehicle.AssignedDrivers.All(driver => driver.Shift != shift)).ToList();
+        }
+
+        public List<Driver> GetAllUnassignedDrivers()
+        {
+            return GetAllDrivers().Where(driver => driver.Car == null).ToList();
+        }
+
+        public List<Driver> GetAllAssignedDrivers()
+        {
+            return GetAllDrivers().Where(driver => driver.Car != null).ToList();
+        }
+
+        public Driver GetDriverById(int id)
+        {
+            return _drivers.GetItemById(id);
+        }
+
+        public Vehicle GetVehicleById(int id)
+        {
+            return _vehicles.GetItemById(id);
+        }
+
     }
 }

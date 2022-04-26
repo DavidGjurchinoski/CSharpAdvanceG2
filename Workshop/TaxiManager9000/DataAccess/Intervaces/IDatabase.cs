@@ -5,6 +5,8 @@
 
         void Insert(T Data);
 
+        void Update(T Data);
+
         List<T> GetAll();
 
         bool Delete(T Data);

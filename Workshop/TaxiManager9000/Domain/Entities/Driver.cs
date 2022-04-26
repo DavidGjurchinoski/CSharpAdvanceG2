@@ -2,9 +2,8 @@
 
 namespace TaxiManager9000.Domain.Entities
 {
-    public class Driver : BaseEntety
+    public class Driver : BaseEntity
     {
-
 
         public Driver(string firstName, string lastName, Shift shift, string license, DateTime licenseExpieryDate)
         {
@@ -38,7 +37,7 @@ namespace TaxiManager9000.Domain.Entities
 
         public override string ToString()
         {
-            return $"{FirstName} {LastName} with Licence: {License}.";
+            return $"ID: {Id}, {FirstName} {LastName} with Licence: {License}.";
         }
 
     }

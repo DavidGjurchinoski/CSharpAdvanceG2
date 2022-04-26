@@ -2,7 +2,7 @@
 
 namespace TaxiManager9000.Domain.Entities
 {
-    public class User : BaseEntety 
+    public class User : BaseEntity 
     {
         //public int Id { get; set; }
 
