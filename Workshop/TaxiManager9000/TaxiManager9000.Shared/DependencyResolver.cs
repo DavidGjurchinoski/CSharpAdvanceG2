@@ -1,6 +1,5 @@
 ﻿using TaxiManager9000.DataAccess;
 using TaxiManager9000.DataAccess.Intervaces;
-using TaxiManager9000.Shared.Intervaces;
 
 namespace TaxiManager9000.Shared
 {
@@ -10,7 +9,8 @@ namespace TaxiManager9000.Shared
         private static Dictionary<Type, object> _dependencies = new Dictionary<Type, object>()
         {
             { typeof(IUserDatabase), new UserDatabase() },
-            { typeof(IVehiclesDatabase), new CarDataBase() }
+            { typeof(IVehiclesDatabase), new VehiclesDataBase() },
+            { typeof(IDriverDatabase), new DriverDatabase() }
 
         };
 

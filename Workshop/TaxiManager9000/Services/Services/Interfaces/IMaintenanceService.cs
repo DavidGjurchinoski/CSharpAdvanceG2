@@ -1,11 +1,11 @@
-﻿namespace TaxiManager9000.Services.Services.Interfaces
+﻿using TaxiManager9000.Domain.Entities;
+
+namespace TaxiManager9000.Services.Services.Interfaces
 {
     public interface IMaintenanceService
     {
 
-        void ShowAllVehicles();
-
-        void ShowAllLicensePlateStatus();
+        List<Vehicle> GetAllVehicles();
 
     }
 }

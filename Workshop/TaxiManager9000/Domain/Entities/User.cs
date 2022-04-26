@@ -35,7 +35,5 @@ namespace TaxiManager9000.Domain.Entities
         {
             Password = newPassword;
         }
-
-
     }
 }

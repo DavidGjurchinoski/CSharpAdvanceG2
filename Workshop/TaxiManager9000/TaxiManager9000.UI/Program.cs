@@ -5,25 +5,28 @@ using TaxiManager9000.Services;
 using TaxiManager9000.Services.Interfaces;
 using TaxiManager9000.Services.Services;
 using TaxiManager9000.Services.Services.Interfaces;
+using TaxiManager9000.Shared.Enums;
 using TaxiManager9000.Shared.Helpers;
 using TaxiManager9000.Shared.Services;
 using TaxiManager9000.UI.Utils;
 
 IAuthService authService = new AuthService();
 IAdminService adminService = new AdminService();
+IMaintenanceService maintenanceService = new MaintenanceService();
+IManagerService managerService = new ManagerService();
 
-StartApplication(authService, adminService);
+StartApplication(authService, adminService, maintenanceService);
 
 Console.ReadLine();
 
-void StartApplication(IAuthService authService, IAdminService adminService)
+void StartApplication(IAuthService authService, IAdminService adminService, IMaintenanceService maintenanceService)
 {
     ShowLogin(authService);
 
-    ShowMenu(authService, adminService);
+    ShowMenu(authService, adminService, maintenanceService, managerService);
 }
 
-void ShowMenu(IAuthService authService, IAdminService adminService)
+void ShowMenu(IAuthService authService, IAdminService adminService, IMaintenanceService maintenanceService, IManagerService managerService)
 {
     switch (authService.CurrentUser.Role)
     {
@@ -31,10 +34,10 @@ void ShowMenu(IAuthService authService, IAdminService adminService)
             ShowAdminMenu(adminService, authService);
             break;
         case Role.Maintainance:
-            ShowMaintainenceMenu(authService);
+            ShowMaintainenceMenu(authService, maintenanceService);
             break;
         case Role.Manager:
-            ShowManagerMenu(authService);
+            ShowManagerMenu(authService, managerService);
             break;
         default:
             ConsoleUtils.WriteLineInColor($"Invalid role, {authService.CurrentUser.Role}", ConsoleColor.Red);
@@ -44,23 +47,57 @@ void ShowMenu(IAuthService authService, IAdminService adminService)
 
 void ShowAdminMenu(IAdminService adminService, IAuthService authService)
 {
-    Console.WriteLine("Write the number what do you want to do:");
+    Console.WriteLine("Input the number what do you want to do:");
 
-    foreach (int i in Enum.GetValues(typeof(AdminAction)))
+    //foreach (int i in Enum.GetValues(typeof(AdminAction)))
+    //{
+    //    Console.Write($"{i}. ");
+
+    //    Console.WriteLine((AdminAction)i);
+    //}
+
+    //Showing all the actions for ADMIN users PLUS the actions for all USERS
+    for (int i = 1; i < Enum.GetNames(typeof(AdminAction)).Length + Enum.GetNames(typeof(UserAction)).Length + 1; i++)
     {
-        Console.Write($"{i}. ");
+        // TO show the right ENUM Value and not go over the lenght
+        if (Enum.GetNames(typeof(UserAction)).Length >= i)
+        {
+            Console.Write($"{i}. ");
 
-        Console.WriteLine((AdminAction)i);
+            Console.WriteLine((UserAction)i);
+        }
+        else
+        {
+            Console.Write($"{i}. ");
+
+            Console.WriteLine((AdminAction)i - Enum.GetNames(typeof(UserAction)).Length);
+        }
     }
 
-    string adminActionInput = Console.ReadLine();
+    string actionInput = Console.ReadLine();
 
-    switch (adminActionInput)
+    if (!int.TryParse(actionInput, out int actionInputInt))
     {
-        case InputHelper.CREATE_NEW_USER:
+        ConsoleUtils.WriteLineInColor("Enter only numbers!", ConsoleColor.Red);
+
+        ConsoleUtils.WriteLineInColor("Returning to Main Menu...", ConsoleColor.Yellow);
+
+        ShowMenu(authService, adminService, maintenanceService, managerService);
+    };
+
+    // To select the right ACTION because the user sees the actions ID first of USER ACTIONS then the THE Other ACTIONS
+    // EXAMPLE user sees 4 but in the enum is 1
+    if (actionInputInt > Enum.GetNames(typeof(AdminAction)).Length)
+    {
+        actionInputInt -= Enum.GetNames(typeof(AdminAction)).Length;
+    }
+
+    switch (actionInput)
+    {
+        case InputHelper.CREATE_NEW_USER_ADMIN:
             ShowCreateNewUser(adminService);
             break;
-        case InputHelper.DELETE_USER:
+        case InputHelper.DELETE_USER_ADMIN:
             ShowDeleteUser(adminService);
             break;
         case InputHelper.CHANGE_PASSWORD:
@@ -70,37 +107,159 @@ void ShowAdminMenu(IAdminService adminService, IAuthService authService)
             ExitApp();
             break;
         case InputHelper.LOG_OUT:
-            LogOut(authService,adminService);
+            LogOut(authService, adminService);
             break;
         default:
-            Console.WriteLine("Invalid Input!");
-            ShowLogin(authService);
+            ConsoleUtils.WriteLineInColor("Enter a number that you see", ConsoleColor.Red);
+            StartApplication(authService, adminService, maintenanceService);
             break;
     }
 }
 
-void ExitApp()
-{
-    ConsoleUtils.WriteLineInColor("Exeting APP...", ConsoleColor.Yellow);
 
-    Environment.Exit(0);
+void ShowMaintainenceMenu(IAuthService authService, IMaintenanceService maintenanceService)
+{
+    Console.WriteLine("Input the number what do you want to do:");
+
+    //Showing all the actions for MAINTANENCE users PLUS the actions for all USERS
+    for (int i = 1; i < Enum.GetNames(typeof(MaintenanceAction)).Length + Enum.GetNames(typeof(UserAction)).Length + 1; i++)
+    {
+        if (Enum.GetNames(typeof(UserAction)).Length >= i)
+        {
+            Console.Write($"{i}. ");
+
+            // TO show the right ENUM Value and not go over the lenght
+            Console.WriteLine((UserAction)i);
+        }
+        else
+        {
+            Console.Write($"{i}. ");
+
+            Console.WriteLine((MaintenanceAction)i - Enum.GetNames(typeof(UserAction)).Length);
+        }
+    }
+
+    string actionInput = Console.ReadLine();
+
+    if (!int.TryParse(actionInput, out int actionInputInt))
+    {
+        ConsoleUtils.WriteLineInColor("Enter only numbers!", ConsoleColor.Red);
+
+        ConsoleUtils.WriteLineInColor("Returning to Main Menu...", ConsoleColor.Yellow);
+
+        ShowMenu(authService, adminService, maintenanceService, managerService);
+    };
+
+    // To select the right ACTION because the user sees the actions ID first of USER ACTIONS then the THE Other ACTIONS
+    // EXAMPLE user sees 4 but in the enum is 1
+    if (actionInputInt > Enum.GetNames(typeof(MaintenanceAction)).Length)
+    {
+        actionInputInt -= Enum.GetNames(typeof(MaintenanceAction)).Length;
+    }
+
+    switch (actionInput)
+    {
+        case InputHelper.SHOW_LICENSE_PLATES_STATUS_MAINTENANCE:
+            ShowAllLicensePlatesStatus(maintenanceService);
+            break;
+        case InputHelper.SHOW_ALL_VEHICLES_MAINTENANCE:
+            ShowAllVehicles(maintenanceService);
+            break;
+        case InputHelper.CHANGE_PASSWORD:
+            ShowChangePassword(authService, adminService);
+            break;
+        case InputHelper.EXIT_APP:
+            ExitApp();
+            break;
+        case InputHelper.LOG_OUT:
+            LogOut(authService, adminService);
+            break;
+        default:
+            ConsoleUtils.WriteLineInColor("Enter a number that you see", ConsoleColor.Red);
+            StartApplication(authService, adminService, maintenanceService);
+            break;
+    }
 }
 
-void LogOut(IAuthService authService, IAdminService adminService)
-{
-    ConsoleUtils.WriteLineInColor("Logging Out...", ConsoleColor.Yellow);
 
-    StartApplication(authService, adminService);
+void ShowManagerMenu(IAuthService authService, IManagerService managerService)
+{
+    Console.WriteLine("Input the number what do you want to do:");
+
+    //Showing all the actions for ADMIN users PLUS the actions for all USERS
+    for (int i = 1; i < Enum.GetNames(typeof(ManagerAction)).Length + Enum.GetNames(typeof(UserAction)).Length + 1; i++)
+    {
+        // TO show the right ENUM Value and not go over the lenght
+        if (Enum.GetNames(typeof(UserAction)).Length >= i)
+        {
+            Console.Write($"{i}. ");
+
+            Console.WriteLine((UserAction)i);
+        }
+        else
+        {
+            Console.Write($"{i}. ");
+
+            Console.WriteLine((ManagerAction)i - Enum.GetNames(typeof(UserAction)).Length);
+        }
+    }
+
+    string actionInput = Console.ReadLine();
+
+    if (!int.TryParse(actionInput, out int actionInputInt))
+    {
+        ConsoleUtils.WriteLineInColor("Enter only numbers!", ConsoleColor.Red);
+
+        ConsoleUtils.WriteLineInColor("Returning to Main Menu...", ConsoleColor.Yellow);
+
+        ShowMenu(authService, adminService, maintenanceService, managerService);
+    };
+
+    // To select the right ACTION because the user sees the actions ID first of USER ACTIONS then the THE Other ACTIONS
+    // EXAMPLE user sees 4 but in the enum is 1
+    if (actionInputInt > Enum.GetNames(typeof(ManagerAction)).Length)
+    {
+        actionInputInt -= Enum.GetNames(typeof(ManagerAction)).Length;
+    }
+
+    switch (actionInput)
+    {
+        case InputHelper.SHOW_ASSIGN_DRIVER_MANAGER:
+            ShowAssignDrivers(maintenanceService);
+            break;
+        case InputHelper.SHOW_UNASSIGN_DRIVER_MANAGER:
+            ShowUnAssignDrivers(maintenanceService);
+            break;
+        case InputHelper.CHANGE_PASSWORD:
+            ShowChangePassword(authService, adminService);
+            break;
+        case InputHelper.EXIT_APP:
+            ExitApp();
+            break;
+        case InputHelper.LOG_OUT:
+            LogOut(authService, adminService);
+            break;
+        default:
+            ConsoleUtils.WriteLineInColor("Enter a number that you see", ConsoleColor.Red);
+            StartApplication(authService, adminService, maintenanceService);
+            break;
+    }
 }
 
-void ShowMaintainenceMenu(IAuthService authService)
+void ShowUnAssignDrivers(IMaintenanceService maintenanceService)
 {
-    throw new NotImplementedException();
+    Console.WriteLine("List of all assigned drivers:");
+    managerService.GetAllDrivers().Where(driver => driver.Car != null).ToList().ForEach(Console.WriteLine);
+
+    ShowMenu(authService, adminService, maintenanceService, managerService);
 }
 
-void ShowManagerMenu(IAuthService authService)
+void ShowAssignDrivers(IMaintenanceService maintenanceService)
 {
-    throw new NotImplementedException();
+    Console.WriteLine("List of all unassigned drivers:");
+    managerService.GetAllDrivers().Where(driver => driver.Car == null).ToList().ForEach(Console.WriteLine);
+
+    ShowMenu(authService, adminService, maintenanceService, managerService);
 }
 
 void ShowLogin(IAuthService authService)
@@ -200,7 +359,7 @@ void ShowDeleteUser(IAdminService adminService)
 void ShowChangePassword(IAuthService authService, IAdminService adminService)
 {
     Console.WriteLine("Enter old password:");
-    
+
     string oldPassword = Console.ReadLine();
 
     if (authService.CurrentUser.Password != oldPassword)
@@ -225,5 +384,42 @@ void ShowChangePassword(IAuthService authService, IAdminService adminService)
         ConsoleUtils.WriteLineInColor("Invalid input! Try again.", ConsoleColor.Red);
     }
 
-    StartApplication(authService, adminService);
+    StartApplication(authService, adminService, maintenanceService);
 }
+
+void ExitApp()
+{
+    ConsoleUtils.WriteLineInColor("Exeting APP...", ConsoleColor.Yellow);
+
+    Environment.Exit(0);
+}
+
+void LogOut(IAuthService authService, IAdminService adminService)
+{
+    ConsoleUtils.WriteLineInColor("Logging Out...", ConsoleColor.Yellow);
+
+    StartApplication(authService, adminService, maintenanceService);
+}
+
+void ShowAllLicensePlatesStatus(IMaintenanceService maintenanceService)
+{
+    maintenanceService.GetAllVehicles().ForEach(vehicle =>
+    {
+        if (DateTime.Now.Subtract(vehicle.LicensePlateExpieryDate).Days < InputHelper.AVRG_DAYS_IN_3_MOUNTHS && DateTime.Now.Subtract(vehicle.LicensePlateExpieryDate).Days > 0)
+        {
+            ConsoleUtils.WriteLineInColor($"Status of Licence Plate: { vehicle.LicensePlate }", ConsoleColor.Yellow);
+        }
+        else
+        {
+            ConsoleUtils.WriteLineInColor($"Status of Licence Plate: { vehicle.LicensePlate }",
+                                          DateTime.Compare(DateTime.Now, vehicle.LicensePlateExpieryDate) > 0 ? ConsoleColor.Red : ConsoleColor.Green);
+        }
+    });
+}
+
+void ShowAllVehicles(IMaintenanceService maintenanceService)
+{
+    maintenanceService.GetAllVehicles().ForEach(Console.WriteLine);
+}
+
+

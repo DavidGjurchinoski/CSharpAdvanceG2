@@ -3,9 +3,6 @@
     public enum AdminAction
     {
         CreateUser = 1,
-        DeleteUser,
-        ExitApp,
-        ChangePassword,
-        LogOut
+        DeleteUser
     }
 }

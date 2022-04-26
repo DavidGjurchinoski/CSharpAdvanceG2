@@ -6,13 +6,13 @@ namespace TaxiManager9000.Domain.Entities
     {
 
 
-        public Driver(string firstName, int lastName, Shift shift, Car car, string license, DateTime licenseExpieryDate)
+        public Driver(string firstName, string lastName, Shift shift, string license, DateTime licenseExpieryDate)
         {
             //Id = -1;
             FirstName = firstName;
             LastName = lastName;
             Shift = shift;
-            Car = car;
+            Car = null;
             License = license;
             LicenseExpieryDate = licenseExpieryDate;
         }
@@ -21,15 +21,25 @@ namespace TaxiManager9000.Domain.Entities
 
         public string FirstName { get; set; }
 
-        public int LastName { get; set; }
+        public string LastName { get; set; }
 
         public Shift Shift { get; set; }
 
-        public Car Car { get; set; }
+        public Vehicle Car { get; set; }
 
         public string License { get; set; }
 
         public DateTime LicenseExpieryDate { get; set; }
+
+        public void AssignCar(Vehicle vehicle)
+        {
+            Car = vehicle;
+        }
+
+        public override string ToString()
+        {
+            return $"{FirstName} {LastName} with Licence: {License}.";
+        }
 
     }
 }
