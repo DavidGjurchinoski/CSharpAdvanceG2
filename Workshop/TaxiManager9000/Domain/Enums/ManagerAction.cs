@@ -3,6 +3,8 @@
     public enum ManagerAction
     {
         AssignUnassignedDrivers = 1,
-        UnasignAssignedDrivers
+        UnasignAssignedDrivers,
+        ListAllDrivers,
+        TaxiLicenseStatus
     }
 }

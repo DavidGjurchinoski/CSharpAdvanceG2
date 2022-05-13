@@ -25,6 +25,8 @@ void StartApplication(IAuthService authService, IAdminService adminService, IMai
     ShowLogin(authService);
 
     ShowMenu(authService, adminService, maintenanceService, managerService);
+
+    StartApplication(authService, adminService, maintenanceService);
 }
 
 void ShowMenu(IAuthService authService, IAdminService adminService, IMaintenanceService maintenanceService, IManagerService managerService)
@@ -180,6 +182,8 @@ void ShowMaintainenceMenu(IAuthService authService, IMaintenanceService maintena
             StartApplication(authService, adminService, maintenanceService);
             break;
     }
+
+    ShowMaintainenceMenu(authService, maintenanceService);
 }
 
 
@@ -187,7 +191,7 @@ void ShowManagerMenu(IAuthService authService, IManagerService managerService)
 {
     Console.WriteLine("Input the number what do you want to do:");
 
-    //Showing all the actions for ADMIN users PLUS the actions for all USERS
+    //Showing all the actions for MANAGER users PLUS the actions for all USERS
     for (int i = 1; i < Enum.GetNames(typeof(ManagerAction)).Length + Enum.GetNames(typeof(UserAction)).Length + 1; i++)
     {
         // TO show the right ENUM Value and not go over the lenght
@@ -231,6 +235,12 @@ void ShowManagerMenu(IAuthService authService, IManagerService managerService)
         case InputHelper.SHOW_UNASSIGN_DRIVER_MANAGER:
             ShowUnAssignDrivers(managerService);
             break;
+        case InputHelper.SHOW_TAXI_LICANCE_STATUS_MANAGER:
+            ShowDriverLicenceStatus(managerService, authService);
+            break;
+        case InputHelper.SHOW_ALL_DRIVERS_MANAGER:
+            ShowAllDrivers(managerService, authService);
+            break;
         case InputHelper.CHANGE_PASSWORD:
             ShowChangePassword(authService, adminService);
             break;
@@ -247,10 +257,35 @@ void ShowManagerMenu(IAuthService authService, IManagerService managerService)
     }
 }
 
+void ShowAllDrivers(IManagerService managerService, IAuthService authService)
+{
+    managerService.GetAllDrivers().ForEach(Console.WriteLine);
+
+    ShowManagerMenu(authService, managerService);
+}
+
+void ShowDriverLicenceStatus(IManagerService managerService, IAuthService authService)
+{
+    managerService.GetAllDrivers().ForEach(driver =>
+    {
+        if (DateTime.Now.Subtract(driver.LicenseExpieryDate).Days < InputHelper.AVRG_DAYS_IN_3_MOUNTHS && DateTime.Now.Subtract(driver.LicenseExpieryDate).Days > 0)
+        {
+            ConsoleUtils.WriteLineInColor($"Status of Licence Plate: { driver.License }", ConsoleColor.Yellow);
+        }
+        else
+        {
+            ConsoleUtils.WriteLineInColor($"Status of Licence Plate: { driver.License }",
+                                          DateTime.Compare(DateTime.Now, driver.LicenseExpieryDate) > 0 ? ConsoleColor.Red : ConsoleColor.Green);
+        }
+    });
+
+    ShowManagerMenu(authService, managerService);
+}
+
 void ShowUnAssignDrivers(IManagerService managerService)
 {
     Console.WriteLine("List of all assigned drivers:");
-    managerService.GetAllAssignedDrivers().ForEach(Console.WriteLine);
+    managerService.GetAllAssignedDrivers().ForEach(driver => Console.WriteLine(driver.PrintForManager()));
 
     string pickedIdDriverString = Console.ReadLine();
 
@@ -268,7 +303,7 @@ void ShowUnAssignDrivers(IManagerService managerService)
         ShowManagerMenu(authService, managerService);
     }
 
-    if (managerService.GetAllAssignedDrivers().Count < pickedIdDriverInt)
+    if (!managerService.GetAllAssignedDrivers().Any(driver => driver.Id == pickedIdDriverInt))
     {
         ConsoleUtils.WriteLineInColor("Enter one of the given numbers!", ConsoleColor.Red);
 
@@ -285,7 +320,7 @@ void ShowUnAssignDrivers(IManagerService managerService)
 void ShowAssignDrivers(IMaintenanceService maintenanceService)
 {
     Console.WriteLine("List of all unassigned drivers: (Pick by number)");
-    managerService.GetAllUnassignedDrivers().ForEach(Console.WriteLine);
+    managerService.GetAllUnassignedDrivers().ForEach(driver => Console.WriteLine(driver.PrintForManager()));
 
     string pickedIdDriverString = Console.ReadLine();
 
@@ -303,7 +338,7 @@ void ShowAssignDrivers(IMaintenanceService maintenanceService)
         ShowManagerMenu(authService, managerService);
     }
 
-    if(managerService.GetAllUnassignedDrivers().Count < pickedIdDriverInt)
+    if(!managerService.GetAllUnassignedDrivers().Any(driver => driver.Id == pickedIdDriverInt))
     {
         ConsoleUtils.WriteLineInColor("Enter one of the given numbers!", ConsoleColor.Red);
 
@@ -332,7 +367,9 @@ void ShowAssignDrivers(IMaintenanceService maintenanceService)
     };
 
     Console.WriteLine("List of all cars that are free thet SHIFT: (Pick by number)");
-    managerService.GetAllVehiclesThatAreFreeThatShift(pickedShift).ForEach(Console.WriteLine);
+    List<Vehicle> freeCars = managerService.GetAllVehiclesThatAreFreeThatShift(pickedShift);
+    
+    freeCars.ForEach(Console.WriteLine);
 
     string pickedIdVehicleString = Console.ReadLine();
 
@@ -350,7 +387,7 @@ void ShowAssignDrivers(IMaintenanceService maintenanceService)
         ShowManagerMenu(authService, managerService);
     }
 
-    if (managerService.GetAllUnassignedDrivers().Count < pickedIdVehicleInt)
+    if (!freeCars.Any(car => car.Id == pickedIdVehicleInt))
     {
         ConsoleUtils.WriteLineInColor("Enter one of the given numbers!", ConsoleColor.Red);
 
@@ -444,7 +481,7 @@ void ShowDeleteUser(IAdminService adminService)
     {
         if (adminService.DeleteUser(userIdInt))
         {
-            Console.WriteLine("User Deleted");
+            ConsoleUtils.WriteLineInColor("User Deleted", ConsoleColor.Red);
 
             ShowAdminMenu(adminService, authService);
         }

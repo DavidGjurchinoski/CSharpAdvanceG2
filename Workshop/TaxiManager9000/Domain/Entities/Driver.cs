@@ -5,13 +5,13 @@ namespace TaxiManager9000.Domain.Entities
     public class Driver : BaseEntity
     {
 
-        public Driver(string firstName, string lastName, Shift shift, string license, DateTime licenseExpieryDate)
+        public Driver(string firstName, string lastName, Shift shift, string license, DateTime licenseExpieryDate, Vehicle? car = null)
         {
             //Id = -1;
             FirstName = firstName;
             LastName = lastName;
             Shift = shift;
-            Car = null;
+            Car = car;
             License = license;
             LicenseExpieryDate = licenseExpieryDate;
         }
@@ -37,7 +37,12 @@ namespace TaxiManager9000.Domain.Entities
 
         public override string ToString()
         {
-            return $"ID: {Id}, {FirstName} {LastName} with Licence: {License}.";
+            return $"{ FirstName } Driving in the { Shift } shift with a { Car?.Model ?? "Has no" } car.";
+        }
+
+        public string PrintForManager()
+        {
+            return $"Driver { FirstName } with license { License } expiering on { LicenseExpieryDate }";
         }
 
     }

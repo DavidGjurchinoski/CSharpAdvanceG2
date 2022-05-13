@@ -21,6 +21,10 @@
 
         public const string SHOW_UNASSIGN_DRIVER_MANAGER = "5";
 
+        public const string SHOW_ALL_DRIVERS_MANAGER = "6";
+
+        public const string SHOW_TAXI_LICANCE_STATUS_MANAGER = "7";
+
         public const double AVRG_DAYS_IN_3_MOUNTHS = 91.5;
     }
 }

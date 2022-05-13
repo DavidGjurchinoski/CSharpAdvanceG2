@@ -1,15 +1,16 @@
-﻿ namespace TaxiManager9000.Domain.Entities
+﻿using TaxiManager9000.Domain.Enums;
+
+namespace TaxiManager9000.Domain.Entities
 {
     public class Vehicle : BaseEntity
     {
-        public Vehicle(string model, string licaLicensePlate, DateTime licensePlateExpieryDate)
+        public Vehicle(string model, string licaLicensePlate, DateTime licensePlateExpieryDate, List<Driver>? drivers = null)
         {
             Model = model;
             LicensePlate = licaLicensePlate;
             LicensePlateExpieryDate = licensePlateExpieryDate;
-            //AsignedDrivers = asignedDrivers;
 
-            AssignedDrivers = new();
+            AssignedDrivers = drivers ?? new List<Driver>();
         }
 
         public string Model { get; set; }
@@ -22,7 +23,20 @@
 
         public override string ToString()
         {
-            return $"ID: {Id} - {Model} with License Plate {LicensePlate} and utilized [Percentage of shifts covered]%";
+            return $"ID: {Id} - {Model} with License Plate {LicensePlate} and utilized {PercentOfShiftsCovered()}%";
+        }
+
+        private decimal PercentOfShiftsCovered()
+        {
+            int numberOfShifts = Enum.GetValues<Shift>().Length;
+            int numberOfUtilizedShifts = 0;
+
+            foreach (var shift in Enum.GetValues<Shift>())
+            {
+                numberOfUtilizedShifts = AssignedDrivers.Any(x => x.Shift == shift) ? numberOfUtilizedShifts + 1 : numberOfUtilizedShifts;
+            }
+
+            return (numberOfUtilizedShifts / numberOfShifts) * 100m;
         }
     }
 }
