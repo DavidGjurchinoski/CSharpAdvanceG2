@@ -3,13 +3,13 @@
     public interface IDatabase<T>
     {
 
-        void Insert(T Data);
+        Task InsertAsync(T Data);
 
-        void Update(T Data);
+        Task UpdateAsync(T Data);
 
         List<T> GetAll();
 
-        bool Delete(T Data);
+        Task DeleteAsync(T Data);
 
         T GetItemById(int Id);
 

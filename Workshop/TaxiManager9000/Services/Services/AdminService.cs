@@ -16,12 +16,12 @@ namespace TaxiManager9000.Services.Services
             _dataBase = DependencyResolver.GetService<IUserDatabase>();
         }
 
-        public bool CreateNewUser(string username, string password, Role role)
+        public async Task<bool> CreateNewUser(string username, string password, Role role)
         {
 
             if (ValidateInput.CheckPassword(password) && ValidateInput.CheckUserName(username))
             {
-                _dataBase.Insert(new User(username, password, role));
+                await _dataBase.Insert(new User(username, password, role));
 
                 return true;
             }

@@ -1,67 +1,88 @@
 ﻿using Newtonsoft.Json;
 using TaxiManager9000.DataAccess.Intervaces;
+using TaxiManager9000.Domain.Entities;
 
 namespace TaxiManager9000.DataAccess
 {
-    public abstract class FileDataBase<T> : IDatabase<T>
+    public abstract class FileDataBase<T> : IDatabase<T> where T : BaseEntity
     {
+        protected List<T> Items;
+        private readonly string _filePath;
+        private int _currentId = 0;
 
-        public bool Delete(T Data)
+        public FileDataBase()
         {
-            throw new NotImplementedException();
+            _filePath = $@"{Directory.GetCurrentDirectory()}\{typeof(T).Name}.json";
+
+            if (!File.Exists(_filePath))
+            {
+                var stream = File.Create(_filePath);
+                stream.Close();
+            }
+
+            Task readFromFile = new(async () => { Items = await ReadFromFileAsync(); });
+            readFromFile.Start();
+            readFromFile.Wait();
+
+            _currentId = Items.OrderBy(data => data.Id).LastOrDefault()?.Id ?? 0;
+        }
+
+        public async Task DeleteAsync(T Data)
+        {
+            Items.Remove(Data);
+
+            await WriteToFileAsync(Items);
         }
 
         public List<T> GetAll()
         {
-            return ReadFromFile();
+            return Items;
         }
 
         public T GetItemById(int Id)
         {
-            throw new NotImplementedException();
+            return Items.FirstOrDefault(x => x.Id == Id);
         }
 
-        public void Insert(T Data)
+        public async Task InsertAsync(T Data)
         {
-            throw new NotImplementedException();
+            AutoIncrementId(Data);
+
+            Items.Add(Data);
+
+            await WriteToFileAsync(Items);
         }
 
-        public void Update(T Data)
+        public async Task UpdateAsync(T Data)
         {
-            throw new NotImplementedException();
+            await WriteToFileAsync(Items);
         }
 
-        private string Serialize(T Data)
+        private async Task WriteToFileAsync(List<T> Data)
         {
-            return JsonConvert.SerializeObject(Data);
-        }
-
-        private T Deserialize(string Data)
-        {
-            return JsonConvert.DeserializeObject<T>(Data);
-        }
-
-        private void WriteToFile(List<T> Data)
-        {
-            using(StreamWriter sw = new StreamWriter(""))
+            using (StreamWriter sw = new StreamWriter(_filePath))
             {
-                Data.ForEach(x => sw.WriteLine(Serialize(x)));
+                await sw.WriteAsync(JsonConvert.SerializeObject(Data));
+                sw.Close();
             }
         }
 
-        private List<T> ReadFromFile()
+        async private Task<List<T>> ReadFromFileAsync()
         {
-            List<T> dataList = new List<T>();
+            string json;
 
-            using(StreamReader sr = new StreamReader(""))
+            using (StreamReader sr = new StreamReader(_filePath))
             {
-               while(!sr.EndOfStream)
-                {
-                    dataList.Add(Deserialize(sr.ReadLine()));
-                }
+                json = await sr.ReadToEndAsync();
+                sr.Close();
             }
 
-            return dataList;
+            return JsonConvert.DeserializeObject<List<T>>(json) ?? new List<T>();
+        }
+
+        protected void AutoIncrementId(T item)
+        {
+            item.Id = ++_currentId;
         }
     }
 }
