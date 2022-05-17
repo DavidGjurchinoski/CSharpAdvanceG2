@@ -20,10 +20,13 @@ namespace TaxiManager9000.DataAccess
 
         private async void Seed()
         {
+            if(Items.Count == 0)
+            {
                 await InsertAsync(new User("test", "test", Domain.Enums.Role.Administrator));
                 await InsertAsync(new User("test1", "test", Domain.Enums.Role.Manager));
                 await InsertAsync(new User("test2", "test", Domain.Enums.Role.Maintainance));
                 await InsertAsync(new User("test3", "test", Domain.Enums.Role.Administrator));
+            }
         }
 
 
