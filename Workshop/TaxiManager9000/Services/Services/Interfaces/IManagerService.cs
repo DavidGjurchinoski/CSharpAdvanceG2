@@ -10,9 +10,9 @@ namespace TaxiManager9000.Services.Services.Interfaces
 
         List<Vehicle> GetAllVehicles();
 
-        void AssignDriver(Driver driver, Vehicle vehicle, Shift shift);
+        Task AssignDriver(Driver driver, Vehicle vehicle, Shift shift);
 
-        void UnAssignDriver(Driver driver);
+        Task UnAssignDriver(Driver driver);
 
         List<Vehicle> GetAllVehiclesThatAreFreeThatShift(Shift shift);
 

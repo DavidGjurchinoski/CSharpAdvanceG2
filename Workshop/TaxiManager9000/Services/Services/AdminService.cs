@@ -21,7 +21,7 @@ namespace TaxiManager9000.Services.Services
 
             if (ValidateInput.CheckPassword(password) && ValidateInput.CheckUserName(username))
             {
-                await _dataBase.Insert(new User(username, password, role));
+                await _dataBase.InsertAsync(new User(username, password, role));
 
                 return true;
             }
@@ -31,16 +31,11 @@ namespace TaxiManager9000.Services.Services
 
         }
 
-        public bool DeleteUser(int userId)
+        public async Task<bool> DeleteUser(int userId)
         {
             User pickedUser = _dataBase.GetItemById(userId);
 
-            if (_dataBase.Delete(pickedUser))
-            {
-                return true;
-            };
-
-            return false;
+            return await _dataBase.DeleteAsync(pickedUser);
         }
 
         public List<User> GetAllUsers()

@@ -6,9 +6,9 @@ namespace TaxiManager9000.Services.Services.Interfaces
     public interface IAdminService
     {
 
-        bool CreateNewUser(string username, string password, Role role);
+        Task<bool> CreateNewUser(string username, string password, Role role);
 
-        bool DeleteUser(int userId);
+        Task<bool> DeleteUser(int userId);
 
         List<User> GetAllUsers();
 

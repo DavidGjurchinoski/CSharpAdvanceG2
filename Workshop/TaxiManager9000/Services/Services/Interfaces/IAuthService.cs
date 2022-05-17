@@ -6,6 +6,8 @@ namespace TaxiManager9000.Services.Interfaces
     {
         User CurrentUser { get; }
 
-        void LogIn(string username, string password);
+        Task LogInAsync(string username, string password);
+
+        Task UpdateUserAsync(User user);
     }
 }

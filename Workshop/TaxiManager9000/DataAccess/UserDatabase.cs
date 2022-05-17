@@ -7,10 +7,12 @@ namespace TaxiManager9000.DataAccess
     {
         public UserDatabase() : base()
         {
-            Seed();
+            Task seedTask = new Task(() => Seed());
+            seedTask.Start();
+            seedTask.Wait();
         }
 
-        public User GetByUserNameAndPassword(string username, string password)
+        public async Task<User> GetByUserNameAndPassword(string username, string password)
         {
             return Items.FirstOrDefault(user => user.UserName == username &&
                                                  user.Password == password);
@@ -18,9 +20,9 @@ namespace TaxiManager9000.DataAccess
 
         private async void Seed()
         {
-                new User("test", "test", Domain.Enums.Role.Administrator),
-                new User("test1", "test", Domain.Enums.Role.Manager),
-                new User("test2", "test", Domain.Enums.Role.Maintainance),
+                await InsertAsync(new User("test", "test", Domain.Enums.Role.Administrator));
+                await InsertAsync(new User("test1", "test", Domain.Enums.Role.Manager));
+                await InsertAsync(new User("test2", "test", Domain.Enums.Role.Maintainance));
                 await InsertAsync(new User("test3", "test", Domain.Enums.Role.Administrator));
         }
 

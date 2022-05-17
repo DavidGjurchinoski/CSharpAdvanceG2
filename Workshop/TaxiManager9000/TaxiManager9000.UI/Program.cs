@@ -52,13 +52,6 @@ void ShowAdminMenu(IAdminService adminService, IAuthService authService)
 {
     Console.WriteLine("Input the number what do you want to do:");
 
-    //foreach (int i in Enum.GetValues(typeof(AdminAction)))
-    //{
-    //    Console.Write($"{i}. ");
-
-    //    Console.WriteLine((AdminAction)i);
-    //}
-
     //Showing all the actions for ADMIN users PLUS the actions for all USERS
     for (int i = 1; i < Enum.GetNames(typeof(AdminAction)).Length + Enum.GetNames(typeof(UserAction)).Length + 1; i++)
     {
@@ -282,7 +275,7 @@ void ShowDriverLicenceStatus(IManagerService managerService, IAuthService authSe
     ShowManagerMenu(authService, managerService);
 }
 
-void ShowUnAssignDrivers(IManagerService managerService)
+async Task ShowUnAssignDrivers(IManagerService managerService)
 {
     Console.WriteLine("List of all assigned drivers:");
     managerService.GetAllAssignedDrivers().ForEach(driver => Console.WriteLine(driver.PrintForManager()));
@@ -310,14 +303,14 @@ void ShowUnAssignDrivers(IManagerService managerService)
         ShowManagerMenu(authService, managerService);
     }
 
-    managerService.UnAssignDriver(managerService.GetDriverById(pickedIdDriverInt));
+    await managerService.UnAssignDriver(managerService.GetDriverById(pickedIdDriverInt));
 
     ConsoleUtils.WriteLineInColor("Druver UnAssigned", ConsoleColor.Yellow);
 
     ShowMenu(authService, adminService, maintenanceService, managerService);
 }
 
-void ShowAssignDrivers(IMaintenanceService maintenanceService)
+async Task ShowAssignDrivers(IMaintenanceService maintenanceService)
 {
     Console.WriteLine("List of all unassigned drivers: (Pick by number)");
     managerService.GetAllUnassignedDrivers().ForEach(driver => Console.WriteLine(driver.PrintForManager()));
@@ -396,14 +389,14 @@ void ShowAssignDrivers(IMaintenanceService maintenanceService)
 
     Vehicle pickedVehicle = managerService.GetVehicleById(pickedIdVehicleInt);
 
-    managerService.AssignDriver(pickedDriver, pickedVehicle, pickedShift);
+    await managerService.AssignDriver(pickedDriver, pickedVehicle, pickedShift);
 
     ConsoleUtils.WriteLineInColor("Driver Asigned", ConsoleColor.Green);
 
     ShowMenu(authService, adminService, maintenanceService, managerService);
 }
 
-void ShowLogin(IAuthService authService)
+async Task ShowLogin(IAuthService authService)
 {
     Console.WriteLine("Enter username");
     string username = Console.ReadLine();
@@ -414,7 +407,7 @@ void ShowLogin(IAuthService authService)
     User currentUser;
     try
     {
-        authService.LogIn(username, password);
+        await authService.LogInAsync(username, password);
 
         ConsoleUtils.WriteLineInColor($"Successful login! Welcome {authService.CurrentUser.Role} {authService.CurrentUser.UserName}",
                                       ConsoleColor.Green);
@@ -425,7 +418,7 @@ void ShowLogin(IAuthService authService)
     }
 }
 
-void ShowCreateNewUser(IAdminService adminService)
+async Task ShowCreateNewUser(IAdminService adminService)
 {
     Console.WriteLine("Creating a new user");
 
@@ -451,7 +444,7 @@ void ShowCreateNewUser(IAdminService adminService)
         try
         {
 
-            if (adminService.CreateNewUser(username, password, role)) ConsoleUtils
+            if (await adminService.CreateNewUser(username, password, role)) ConsoleUtils
                             .WriteLineInColor($"Successful creation of an {role} user!", ConsoleColor.Green);
 
             adminService.GetAllUsers().ForEach(Console.WriteLine);
@@ -469,7 +462,7 @@ void ShowCreateNewUser(IAdminService adminService)
     else Console.WriteLine("Enter one of the shown numbers!");
 }
 
-void ShowDeleteUser(IAdminService adminService)
+async Task ShowDeleteUser(IAdminService adminService)
 {
     adminService.GetAllUsers().ForEach(Console.WriteLine);
 
@@ -479,7 +472,7 @@ void ShowDeleteUser(IAdminService adminService)
 
     if (int.TryParse(userId, out int userIdInt))
     {
-        if (adminService.DeleteUser(userIdInt))
+        if (await adminService.DeleteUser(userIdInt))
         {
             ConsoleUtils.WriteLineInColor("User Deleted", ConsoleColor.Red);
 
@@ -497,7 +490,7 @@ void ShowDeleteUser(IAdminService adminService)
 
 }
 
-void ShowChangePassword(IAuthService authService, IAdminService adminService)
+async Task ShowChangePassword(IAuthService authService, IAdminService adminService)
 {
     Console.WriteLine("Enter old password:");
 
@@ -517,6 +510,7 @@ void ShowChangePassword(IAuthService authService, IAdminService adminService)
     if (ValidateInput.CheckPassword(newPassword))
     {
         authService.CurrentUser.ChangePassword(newPassword);
+        await authService.UpdateUserAsync(null);
 
         ConsoleUtils.WriteLineInColor("Password has been changed.", ConsoleColor.Green);
     }

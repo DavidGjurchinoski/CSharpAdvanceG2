@@ -6,7 +6,7 @@ namespace TaxiManager9000.DataAccess
 {
     public abstract class FileDataBase<T> : IDatabase<T> where T : BaseEntity
     {
-        protected List<T> Items;
+        protected List<T> Items = new();
         private readonly string _filePath;
         private int _currentId = 0;
 
@@ -24,14 +24,24 @@ namespace TaxiManager9000.DataAccess
             readFromFile.Start();
             readFromFile.Wait();
 
+            //while(!readFromFile.IsCompleted)
+            //{
+            //    Items.ForEach()
+            //}
+
             _currentId = Items.OrderBy(data => data.Id).LastOrDefault()?.Id ?? 0;
         }
 
-        public async Task DeleteAsync(T Data)
+        public async Task<bool> DeleteAsync(T Data)
         {
-            Items.Remove(Data);
+            if(Items.Remove(Data))
+            {
+                await WriteToFileAsync(Items);
 
-            await WriteToFileAsync(Items);
+                return true;
+            };
+
+            return false;
         }
 
         public List<T> GetAll()
@@ -67,7 +77,7 @@ namespace TaxiManager9000.DataAccess
             }
         }
 
-        async private Task<List<T>> ReadFromFileAsync()
+        private async Task<List<T>> ReadFromFileAsync()
         {
             string json;
 

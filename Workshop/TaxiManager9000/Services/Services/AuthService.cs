@@ -17,7 +17,7 @@ namespace TaxiManager9000.Services
             _database = DependencyResolver.GetService<IUserDatabase>();
         }
 
-        public void LogIn(string username, string password)
+        public async Task LogInAsync(string username, string password)
         {
             if (string.IsNullOrEmpty(username))
             {
@@ -29,7 +29,7 @@ namespace TaxiManager9000.Services
                 throw new ArgumentNullException("Password is empty");
             }
 
-            User currentUser = _database.GetByUserNameAndPassword(username, password);
+            User currentUser = await _database.GetByUserNameAndPassword(username, password);
 
             if (currentUser == null)
             {
@@ -37,6 +37,11 @@ namespace TaxiManager9000.Services
             }
 
             CurrentUser = currentUser;
+        }
+
+        public async Task UpdateUserAsync(User user)
+        {
+            _database.UpdateAsync(user);
         }
     }
 }

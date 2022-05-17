@@ -28,20 +28,26 @@ namespace TaxiManager9000.Services.Services
             return _vehicles.GetAll();
         }
 
-        public void AssignDriver(Driver driver, Vehicle vehicle, Shift shift)
+        public async Task AssignDriver(Driver driver, Vehicle vehicle, Shift shift)
         {
             vehicle.AssignedDrivers.Add(driver);
 
             driver.Car = vehicle;
 
             driver.Shift = shift;
+
+            await _vehicles.UpdateAsync(null);
+            await _drivers.UpdateAsync(null);
         }
 
-        public void UnAssignDriver(Driver driver)
+        public async Task UnAssignDriver(Driver driver)
         {
             driver.Car.AssignedDrivers.Remove(driver);
 
             driver.Car = null;
+
+            await _drivers.UpdateAsync(null);
+            await _vehicles.UpdateAsync(null);
         }
 
         public List<Vehicle> GetAllVehiclesThatAreFreeThatShift(Shift shift)

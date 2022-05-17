@@ -9,7 +9,7 @@
 
         List<T> GetAll();
 
-        Task DeleteAsync(T Data);
+        Task<bool> DeleteAsync(T Data);
 
         T GetItemById(int Id);
 

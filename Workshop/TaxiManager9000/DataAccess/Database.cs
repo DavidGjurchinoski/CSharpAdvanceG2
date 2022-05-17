@@ -10,7 +10,7 @@ namespace TaxiManager9000.DataAccess
         {
             _items = new List<T>();
         }
-        public void Update(T Data)
+        public async Task UpdateAsync(T Data)
         {
             T foundItem = _items.FirstOrDefault(item => item.Id == Data.Id);
 
@@ -19,7 +19,7 @@ namespace TaxiManager9000.DataAccess
             if (foundItem != null) _items[index] = Data;
         }
 
-        public bool Delete(T Data)
+        public async Task<bool> DeleteAsync(T Data)
         {
             return _items.Remove(Data);
         }
@@ -34,7 +34,7 @@ namespace TaxiManager9000.DataAccess
             return _items.FirstOrDefault(item => item.Id == Id);
         }
 
-        public void Insert(T Data)
+        public async Task InsertAsync(T Data)
         {
             T itemToInsert = AutoIncrementId(Data);
 
